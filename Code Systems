@@ -1,0 +1,203 @@
+from datetime import datetime
+
+def add_item(inventory, history, item_name, category, quantity, price_per_unit):
+    """Add items to the inventory with pricing and categorization."""
+    action = "Added"
+    if item_name in inventory:
+        inventory[item_name]['quantity'] += quantity
+        inventory[item_name]['price_per_unit'] = price_per_unit
+        inventory[item_name]['category'] = category
+    else:
+        inventory[item_name] = {
+            'category': category,
+            'quantity': quantity,
+            'price_per_unit': price_per_unit
+        }
+    history.append(f"{datetime.now()}: {action} {quantity} {item_name}(s) under category '{category}' at ₱{price_per_unit:.2f} each.")
+    print(f"\n{quantity} {item_name}(s) added to inventory under category '{category}' at ₱{price_per_unit:.2f} each.")
+
+def remove_item(inventory, history, item_name, quantity):
+    """Remove items from the inventory."""
+    if item_name in inventory and inventory[item_name]['quantity'] >= quantity:
+        inventory[item_name]['quantity'] -= quantity
+        if inventory[item_name]['quantity'] == 0:
+            del inventory[item_name]
+        history.append(f"{datetime.now()}: Removed {quantity} {item_name}(s).")
+        print(f"{quantity} {item_name}(s) removed from inventory.")
+    else:
+        print("Insufficient quantity or item not found in inventory.")
+
+def update_item(inventory, history, item_name, category=None, quantity=None, price_per_unit=None):
+    """Update the category, quantity, or price of an item."""
+    if item_name in inventory:
+        details = inventory[item_name]
+        old_details = details.copy()
+        if category is not None:
+            details['category'] = category
+        if quantity is not None:
+            details['quantity'] = quantity
+        if price_per_unit is not None:
+            details['price_per_unit'] = price_per_unit
+        history.append(f"{datetime.now()}: Updated {item_name} from {old_details} to {details}.")
+        print(f"{item_name} has been updated.")
+    else:
+        print("Item not found in inventory.")
+
+def display_inventory(inventory):
+    """Display all items in the inventory with total pricing and categories in a formatted table."""
+    if not inventory:
+        print("Inventory is empty.")
+    else:
+        total_value = 0
+        print("\n                                        CURRENT INVENTORY")
+        print("=" * 100)
+        print(f"{'ITEM':<15}       {'CATEGORY':<15}     {'QUANTITY':<10}     {'UNIT PRICE':<12}    {'TOTAL PRICE'}")
+        print("=" * 100)
+        for item_name, details in inventory.items():
+            category = details['category']
+            quantity = details['quantity']
+            price_per_unit = details['price_per_unit']
+            total_price = quantity * price_per_unit
+            total_value += total_price
+            print(f"{item_name:<15}       {category:<15}     {quantity:<10}     ₱{price_per_unit:<12.2f}     ₱{total_price:.2f}")
+        print("=" * 100)
+        print(f"{'TOTAL INVENTORY VALUE:':<52}                       ₱{total_value:.2f}")
+        print("=" * 100)
+
+def display_history(history):
+    """Display the history of inventory changes with design."""
+    if not history:
+        print("No history available.")
+    else:
+        print("\n" + "="*50)
+        print("                  INVENTORY HISTORY")
+        print("="*50)
+        for record in history:
+            print(f"- {record}")
+        print("="*50)
+
+def generate_inventory_report(inventory):
+    """Generate a detailed inventory report."""
+    if not inventory:
+        print("No inventory data available to generate a report.")
+    else:
+        print("\n" + "="*100)
+        print("                               INVENTORY REPORT")
+        print("="*100)
+        print(f"{'ITEM':<15}       {'CATEGORY':<15}     {'QUANTITY':<10}     {'UNIT PRICE':<12}    {'TOTAL PRICE'}")
+        print("="*100)
+        for item_name, details in inventory.items():
+            category = details['category']
+            quantity = details['quantity']
+            price_per_unit = details['price_per_unit']
+            total_price = quantity * price_per_unit
+            print(f"{item_name:<15}       {category:<15}     {quantity:<10}     ₱{price_per_unit:<12.2f}     ₱{total_price:.2f}")
+        print("="*100)
+        print("Note: Report generated successfully.")
+        print("="*100)
+
+def search_item(inventory, item_name):
+    """Search for an item in the inventory."""
+    if item_name in inventory:
+        details = inventory[item_name]
+        category = details['category']
+        quantity = details['quantity']
+        price_per_unit = details['price_per_unit']
+        total_price = quantity * price_per_unit
+        print(f"Item found: {item_name}")
+        print(f"Category: {category}")
+        print(f"Quantity: {quantity}")
+        print(f"Unit Price: ₱{price_per_unit:.2f}")
+        print(f"Total Price: ₱{total_price:.2f}")
+    else:
+        print("Item not found in inventory.")
+
+def track_quantity(inventory, threshold=5):
+    """Track product quantities and alert if items are below the specified threshold."""
+    low_stock_items = []
+
+    print("\nTracking Product Quantities...")
+    for item_name, details in inventory.items():
+        quantity = details['quantity']
+        if quantity < threshold:
+            low_stock_items.append((item_name, quantity))
+
+    if low_stock_items:
+        print("The following items are below the reorder level:")
+        print(f"{'Item':<15}{'Quantity':<10}")
+        for item_name, quantity in low_stock_items:
+            print(f"{item_name:<15}{quantity:<10}")
+    else:
+        print("All items are sufficiently stocked.")
+
+def main():
+    inventory = {} 
+    history = [] 
+
+    while True:
+        print("="*64)
+        print("       Welcome to Inventory Management System, Janice! 🎉")
+        print("="*64)
+        print("                ✨ INVENTORY MANAGEMENT SYSYEM ✨")
+        print("="*64)
+        print("1.🛒 Add Item ")
+        print("2.❌ Remove Item ")
+        print("3.📦 Display Inventory ")
+        print("4.🔍 Search Item ")
+        print("5.🆙 Update Item ")
+        print("6.📜 Display History")
+        print("7.📑 Track Product Quantity ")
+        print("8.📝 Generate Inventory Report")
+        print("9.🔚 Exit ")
+        print("="*64)
+        
+        choice = input("\nEnter your choice (1-9): ")
+        
+        if choice == "1":
+            item_name = input("Enter the item name: ")
+            category = input("Enter the category: ")
+            quantity = int(input("Enter the quantity: "))
+            price_per_unit = float(input("Enter the price per unit: "))
+            add_item(inventory, history, item_name, category, quantity, price_per_unit)
+        
+        elif choice == "2":
+            item_name = input("Enter the item name: ")
+            quantity = int(input("Enter the quantity: "))
+            remove_item(inventory, history, item_name, quantity)
+        
+        elif choice == "3":
+            display_inventory(inventory)
+        
+        elif choice == "4":
+            item_name = input("Enter the item name to search: ")
+            search_item(inventory, item_name)
+        
+        elif choice == "5":
+            item_name = input("Enter the item name to update: ")
+            category = input("Enter the new category (or press Enter to skip): ")
+            quantity = input("Enter the new quantity (or press Enter to skip): ")
+            price_per_unit = input("Enter the new price per unit (or press Enter to skip): ")
+            category = category if category else None
+            quantity = int(quantity) if quantity else None
+            price_per_unit = float(price_per_unit) if price_per_unit else None
+            update_item(inventory, history, item_name, category, quantity, price_per_unit)
+        
+        elif choice == "6":
+            display_history(history)
+
+        elif choice == "7":
+            threshold = int(input("Enter the reorder threshold: "))
+            track_quantity(inventory, threshold)
+        
+        elif choice == "8":
+            generate_inventory_report(inventory)
+        
+        elif choice == "9":
+            print("Exiting the Inventory Management System. Goodbye!")
+            break
+        
+        else:
+            print("Invalid choice. Please select a valid option.")
+
+if __name__ == "__main__":
+    main()
